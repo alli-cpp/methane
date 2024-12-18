@@ -1,19 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Methane Molecule in 3D</title>
+    <meta charset="utf-8">
+    <meta name="description" content="CS4406 Computer Graphics - Exercise #5" />
+    <meta charset="utf-8" />
+    <title>Assignment #5 for CS4406 Computer Graphics</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-    <!-- Include Three.js library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Include OrbitControls.js for mouse control -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/controls/OrbitControls.min.js"></script>
+    <div id="Title Continer">
+        <div class="form-check form-check-inline">
+            <form id="Title">
+                <label class="Title" for="">CS4406 Computer Graphics - Unit 5</label>
+            </form>
+        </div>
+        <div id="info"> Methane CH<sub>4</sub></div>
+        <div id="container"></div>
+    </div>
     
-    <!-- Link to your JavaScript file -->
+    <script type="text/javascript" src="https://getfirebug.com/firebug-lite-debug.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/108/three.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.5/dat.gui.min.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js"></script>
+    <script type="text/javascript" src="https://threejs.org/examples/js/controls/TransformControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/6.2.1/math.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/16.3.5/Tween.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
