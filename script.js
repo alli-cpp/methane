@@ -1,105 +1,113 @@
-// Create the scene
-const scene = new THREE.Scene();
+// set the scene size
+var WIDTH = 700, HEIGHT = 700;
+// set some camera attributes
+var VIEW_ANGLE = 45, ASPECT = WIDTH / HEIGHT, NEAR = 1, FAR = 1000;
+// get the DOM element to attach to
+var $container = $('#container');
+// create a WebGL renderer, camera, and a scene
+var renderer = new THREE.WebGLRenderer();
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+var scene = new THREE.Scene();
+var clock = new THREE.Clock();
+var camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+var canvas = renderer.domElement;
 
-// Create the camera
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 5; // Position the camera along the Z-axis
+// Create a listener for the canvas element to track the moving of the user's mouse.
+canvas.addEventListener('mousemove', onMouseMove);
 
-// Create the renderer
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight); // Set the canvas size
-document.body.appendChild(renderer.domElement); // Add the renderer's canvas to the HTML body
+// the camera starts at 0,0,0 so pull it back
+camera.position.z = 200;
+// add the camera to the scene
+scene.add(camera);
 
-// Create a green plane to reflect light and show shadows
-const planeGeometry = new THREE.PlaneGeometry(20, 20);
-const planeMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
-const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-plane.rotation.x = -Math.PI / 2; // Rotate the plane to be flat
-plane.position.y = -2; // Position the plane below the molecule
-plane.receiveShadow = true; // The plane will receive shadows
-scene.add(plane);
+// start the renderer
+renderer.setSize(WIDTH, HEIGHT);
+// attach the render-supplied DOM element
+$container.append(renderer.domElement);
 
-// Create a red sphere (Carbon Atom)
-const carbonGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-const carbonMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 }); // Red for carbon
-const carbonAtom = new THREE.Mesh(carbonGeometry, carbonMaterial);
-scene.add(carbonAtom);
+// Create a point light
+var areaLight = new THREE.RectAreaLight(0xffffff, 10);
+var spotLight = new THREE.SpotLight(0xffffff);
+spotLight.position.set(0, 80, 0);
+spotLight.castShadow = true;
+scene.add(areaLight, spotLight);
 
-// Create blue spheres (Hydrogen Atoms)
-const hydrogenGeometry = new THREE.SphereGeometry(0.3, 32, 32);
-const hydrogenMaterial = new THREE.MeshLambertMaterial({ color: 0x0000ff }); // Blue for hydrogen
+// Define the qualities of the shadows
+spotLight.shadow.mapSize.width = 512;
+spotLight.shadow.mapSize.height = 512;
+spotLight.shadow.camera.near = 0.5;
+spotLight.shadow.camera.far = 500;
+spotLight.shadow.focus = 1;
 
-const hydrogenAtoms = [];
-for (let i = 0; i < 4; i++) {
-    const hydrogenAtom = new THREE.Mesh(hydrogenGeometry, hydrogenMaterial);
-    hydrogenAtoms.push(hydrogenAtom);
-    scene.add(hydrogenAtom);
+// create materials for the atoms and bonds
+var cMaterial = new THREE.MeshPhongMaterial({ color: 0xab0000, emissive: 0xaa2222, shininess: 8, specular: 0x0fffff });
+var hMaterial = new THREE.MeshPhongMaterial({ color: 0x2080aa, emissive: 0x000aa, shininess: 8, specular: 0x0fffff });
+var bMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xaaaaaa });
+var pMaterial = new THREE.MeshPhongMaterial({ color: 0x80f080, emissive: 0x001000, side: THREE.DoubleSide });
+
+// set up the sphere vars
+var cRadius = 20, cSegments = 35, cRings = 35;
+var hRadius = 10, hSegments = 35, hRings = 35;
+
+// create meshes for the atoms and bonds
+var carbon = new THREE.Mesh(new THREE.SphereGeometry(cRadius, cSegments, cRings), cMaterial);
+var hydrogen1 = new THREE.Mesh(new THREE.SphereGeometry(hRadius, hSegments, hRings), hMaterial);
+var hydrogen2 = new THREE.Mesh(new THREE.SphereGeometry(hRadius, hSegments, hRings), hMaterial);
+var hydrogen3 = new THREE.Mesh(new THREE.SphereGeometry(hRadius, hSegments, hRings), hMaterial);
+var hydrogen4 = new THREE.Mesh(new THREE.SphereGeometry(hRadius, hSegments, hRings), hMaterial);
+var bond1 = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 60, 35), bMaterial);
+var bond2 = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 60, 35), bMaterial);
+var bond3 = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 60, 35), bMaterial);
+var bond4 = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 60, 35), bMaterial);
+var plane = new THREE.Mesh(new THREE.PlaneGeometry(500, 500, 500), pMaterial);
+
+// Group atoms and bonds together
+var CH4 = new THREE.Group();
+CH4.add(carbon, hydrogen1, hydrogen2, hydrogen3, hydrogen4, bond1, bond2, bond3, bond4);
+scene.add(CH4, plane);
+
+// Set positions and rotations
+hydrogen1.position.y = 50;
+hydrogen2.position.y = -25;
+hydrogen2.position.z = 50;
+hydrogen3.position.x = -50;
+hydrogen3.position.y = -25;
+hydrogen3.position.z = -10;
+hydrogen4.position.x = 50;
+hydrogen4.position.y = -25;
+hydrogen4.position.z = -10;
+bond1.position.y = 20;
+bond2.position.y = -10;
+bond2.position.z = 15;
+bond2.rotation.x = -20;
+bond3.position.x = -15;
+bond3.position.y = -10;
+bond3.position.z = -6;
+bond3.rotation.y = -0.2;
+bond3.rotation.z = -20;
+bond4.position.x = 15;
+bond4.position.y = -10;
+bond4.position.z = -6;
+bond4.rotation.y = 0.2;
+bond4.rotation.z = 20;
+plane.position.y = -55;
+plane.rotation.x = 300;
+
+// Mouse move listener to rotate the molecule
+function onMouseMove(event) {
+    CH4.rotation.x += event.movementY * 0.002;
+    CH4.rotation.y += event.movementX * 0.002;
 }
 
-// Set positions for hydrogen atoms
-hydrogenAtoms[0].position.set(1, 0, 1);  // Position 1
-hydrogenAtoms[1].position.set(-1, 0, 1); // Position 2
-hydrogenAtoms[2].position.set(1, 0, -1); // Position 3
-hydrogenAtoms[3].position.set(-1, 0, -1); // Position 4
-
-// Create cylinders (bonds between atoms)
-const bondGeometry = new THREE.CylinderGeometry(0.05, 0.05, 2, 32);
-const bondMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0xaaaaaa }); // White bonds with light gray emissive color
-
-const bonds = [];
-for (let i = 0; i < 4; i++) {
-    const bond = new THREE.Mesh(bondGeometry, bondMaterial);
-    bonds.push(bond);
-    scene.add(bond);
-}
-
-// Update the bond positions based on atoms
-function updateBonds() {
-    for (let i = 0; i < 4; i++) {
-        const start = carbonAtom.position;
-        const end = hydrogenAtoms[i].position;
-        const direction = new THREE.Vector3().subVectors(end, start);
-        const length = direction.length();
-        bondGeometry.parameters.height = length;
-        bond.position.copy(start).add(end).multiplyScalar(0.5); // Set bond position between atoms
-        bond.lookAt(end); // Rotate bond to align with the vector
-    }
-}
-updateBonds();
-
-// Create lighting
-const light = new THREE.PointLight(0xffffff, 1, 100);
-light.position.set(10, 10, 10);
-light.castShadow = true; // The light will cast shadows
-scene.add(light);
-
-// Add ambient light to illuminate shadows
-const ambientLight = new THREE.AmbientLight(0x404040, 1);
-scene.add(ambientLight);
-
-// Enable mouse control (OrbitControls)
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
-
-// Create the render loop
+// Render function
 function animate() {
     requestAnimationFrame(animate);
-
-    // Update the bond positions in case the molecule moves
-    updateBonds();
-
-    // Rotate the carbon atom for animation
-    carbonAtom.rotation.y += 0.01;
-    hydrogenAtoms.forEach(atom => atom.rotation.y += 0.01);
-
-    controls.update(); // Update OrbitControls
-    renderer.render(scene, camera); // Render the scene from the camera's perspective
+    render();
 }
 
-animate(); // Start the animation loop
+function render() {
+    renderer.render(scene, camera);
+}
 
-// Adjust for window resizing
-window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-});
+animate();
