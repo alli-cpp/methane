@@ -1,0 +1,10 @@
+/* Reset body margin and hide overflow */
+body {
+    margin: 0;
+    overflow: hidden;
+}
+
+/* Ensure canvas takes up full screen */
+canvas {
+    display: block;
+}
